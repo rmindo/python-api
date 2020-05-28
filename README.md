@@ -1,4 +1,4 @@
-# RESTful API
+# Python RESTful API
 
 Python-Flask RESTful API and MySQL
 
