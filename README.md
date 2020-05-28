@@ -116,15 +116,15 @@ NR0iQxriuZvmOSjAXswMlk4t4TMEge6QspAbZSa9o6rty2jMc0BJjKjFtPNVCkDuG5fAPxW20gCfn37Q
 ```
 ### Response Status Code
 ```
-	200: Ok
-	201: Created
-	400: Bad Request
-	401: Unauthorized
-	403: Forbidden
-	404: Not Found
-	405: Method Not Allowed
-	406: Not Acceptable
-	409: Conflict
+200: Ok
+201: Created
+400: Bad Request
+401: Unauthorized
+403: Forbidden
+404: Not Found
+405: Method Not Allowed
+406: Not Acceptable
+409: Conflict
 ```
 
 ### Database Schema
