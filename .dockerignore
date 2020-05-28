@@ -1,0 +1,7 @@
+# Environment
+env
+.env
+# MySQL directory
+data
+# Cache
+__pycache__

@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS `addresses` (
+  `id`        	   INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `user`		       INT(11) DEFAULT NULL,
+  `number`		     INT(20) DEFAULT NULL,
+  `type`		       VARCHAR(20) DEFAULT NULL,
+  `street`	       VARCHAR(50) DEFAULT NULL,
+  `unit`	         VARCHAR(50) DEFAULT NULL,
+  `city`	         VARCHAR(50) DEFAULT NULL,
+  `state`	         VARCHAR(50) DEFAULT NULL,
+  `zipcode`	       VARCHAR(50) DEFAULT NULL,
+  `datecreated` 	 TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `datemodified`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `addresses` (`id`,`user`),
+  FOREIGN KEY (user) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
