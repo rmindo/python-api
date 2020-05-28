@@ -16,7 +16,7 @@ $ docker run --network=api --name=mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=demo
 
 
 ##### Flask API Container
-Run a separate container with public port 2000 and in a network api
+Run a separate container with public port 2000 in a network api
 
 ```
 $ docker pull rmindo/python-api
