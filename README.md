@@ -179,5 +179,5 @@ CREATE TABLE IF NOT EXISTS `addresses` (
 
 ### Diagram
 <p align="center">
-  ![Database Design](https://i.ibb.co/R2cPg12/Schema-Design.png)
+	<img width="600" src="https://i.ibb.co/R2cPg12/Schema-Design.png">
 </p>
