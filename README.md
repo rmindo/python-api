@@ -175,3 +175,7 @@ CREATE TABLE IF NOT EXISTS `addresses` (
   FOREIGN KEY (user) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ```
+
+
+### Diagram
+![Database Design](https://ibb.co/Y2h8N62)
