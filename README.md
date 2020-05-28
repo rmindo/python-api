@@ -3,7 +3,7 @@
 Python-Flask RESTful API and MySQL
 
 
-### Run with separate container
+### Run docker with separate container
 
 ##### MySQL Container
 Run mysql in a network api with MYSQL_ROOT_PASSWORD and MYSQL_ROOT_HOST specified.
