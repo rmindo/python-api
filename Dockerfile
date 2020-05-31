@@ -1,7 +1,7 @@
 # Base image
 FROM python:3.8.2-alpine3.11
 
-# Add a token argument
+# Add arguments
 ARG DB_HOST
 ARG DB_USER
 ARG DB_NAME
@@ -11,7 +11,7 @@ ARG DB_PASSWORD
 # Working directory
 WORKDIR /www/api
 
-# Copy the app to working directory
+# Copy the app to the working directory
 COPY . ./
 
 # Upgrade pip
