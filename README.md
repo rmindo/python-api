@@ -5,6 +5,12 @@ Python-Flask RESTful API and MySQL
 
 ### Run docker with separate container
 
+##### Create Network
+Create docker network api 
+```
+$ docker network create -d bridge api
+```
+
 ##### MySQL Container
 Run mysql in a network api with MYSQL_ROOT_PASSWORD and MYSQL_ROOT_HOST specified.
 ```
