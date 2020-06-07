@@ -86,19 +86,19 @@ Initialize database and request token
 - PUT /api/v1/users/{user_id}
 - DELETE /api/v1/users/{user_id}
 
-##### Addresses
-- GET /api/v1/users/{user_id}/addresses
-- POST /api/v1/users/{user_id}/addresses
-- GET /api/v1/users/{user_id}/addresses/{address_id}
-- PUT /api/v1/users/{user_id}/addresses/{address_id}
-- DELETE /api/v1/users/{user_id}/addresses/{address_id}
-
 ##### Contacts
 - GET /api/v1/users/{user_id}/contacts
 - POST /api/v1/users/{user_id}/contacts
 - GET /api/v1/users/{user_id}/contacts/{contact_id}
 - PUT /api/v1/users/{user_id}/contacts/{contact_id}
 - DELETE /api/v1/users/{user_id}/contacts/{contact_id}
+
+##### Addresses
+- GET /api/v1/users/{user_id}/contacts/{contact_id}/addresses
+- POST /api/v1/users/{user_id}/contacts/{contact_id}/addresses
+- GET /api/v1/users/{user_id}/contacts/{contact_id}/addresses/{address_id}
+- PUT /api/v1/users/{user_id}/contacts/{contact_id}/addresses/{address_id}
+- DELETE /api/v1/users/{user_id}/contacts/{contact_id}/addresses/{address_id}
 
 
 ### Authorization
