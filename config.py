@@ -12,5 +12,12 @@ config = {
     'host': os.environ['DB_HOST'],
     'database': os.environ['DB_NAME'],
     'password': os.environ['DB_PASSWORD']
-  }
+  },
+  'resource': [
+    {
+      'users': 'string:id',
+      'contacts': 'string:key',
+      'addresses': 'string:index'
+    },
+  ]
 }

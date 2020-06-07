@@ -6,40 +6,32 @@ from flask_cors import CORS
 
 # Configuration
 from config import config
-
 # Request
 from src.http import HTTP
-
-# API Versions
-from src.versions.v1.api import API1
-
 # Models
+from src.models.init import initialize
 from src.models.database import Database
+
+
 
 
 api = {}
 
 # HTTP Request
-http = HTTP()
+http = HTTP(config)
+
+# Database
+database = Database(config)
 
 ##
 # Allow Cross Origin
 #
 CORS(http.flask)
 
-# Database
-database = Database(config)
-
-##
-# API Versions, new version of
-# the API will be added below
-#
-api['v1'] = API1(database)
-
 ##
 # Routes for every request
 #
-http.api(api)
+http.routes(database)
 
 
 
@@ -57,6 +49,12 @@ def notfound(e):
 def notallowed(e):
   return http.response([], 405)
 
+
+
+# Initialize database
+@http.flask.route('/init')
+def init():
+  return initialize(http, database)
 
 
 # Run the App

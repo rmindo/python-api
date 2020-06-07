@@ -1,54 +1,118 @@
 import json
 import decimal
 import datetime
+import importlib as imp
 
 # Flask Framework
 from flask import Flask, jsonify, request, make_response, Response
 
-
-# Versions
-from src.routes import api
-
 # Models
 from src.models.auth import Auth
+from src.models.init import initialize
+
 
 
 # HTTP
 class HTTP:
   
   status = {
-		'200': 'Ok',
-		'201': 'Created',
-		'400': 'Bad Request',
-		'401': 'Unauthorized',
-		'403': 'Forbidden',
-		'404': 'Not Found',
-		'405': 'Method Not Allowed',
-		'406': 'Not Acceptable',
-		'409': 'Conflict',
+    '200': 'Ok',
+    '201': 'Created',
+    '400': 'Bad Request',
+    '401': 'Unauthorized',
+    '403': 'Forbidden',
+    '404': 'Not Found',
+    '405': 'Method Not Allowed',
+    '406': 'Not Acceptable',
+    '409': 'Conflict',
+    '500': 'Internal Server Error',
 	}
   
   # Request
   request = request
   
   
-  def __init__(self):
+  def __init__(self, config):
     
     # Authentication
     self.auth = Auth()
 		# Flask Framework
     self.flask = Flask(__name__)
-    
+    # Configuration
+    self.config = config
+
+
   
   # API Services
-  def api(self, service):
-    api(self, service)
+  def routes(self, db):
+    routes = {}
+
+    # For routing
+    rule = self.flask.add_url_rule
+    views = self.flask.view_functions
+
+    # Import module
+    def mod(version, name):
+      return imp.import_module(f"src.versions.{version}.{name}")
+
+    # View functions
+    def view(name, item):
+      def handler(**args):
+        try:
+          ins = getattr(mod(args['version'], name), name.capitalize())(db)
+          if hasattr(ins, item[2]):
+            result, code = getattr(ins, item[2])(request, args)
+            if result:
+              return self.createResponse(db, result, code)
+          else:
+            return self.response({'error': f'Missing attribute {name}'}, 400)
+        except Exception:
+          return self.response({'error': 'Something went wrong'}, 500)
+      return handler
+
+    # Resource routes
+    for items in self.config['resource']:
+      path = ''
+      for name, uid in items.items():
+        path += f"/{name}"
+        # Route resource
+        routes[name] = [
+          ['GET', path, 'index'],
+          ['POST', path, 'create'],
+        ]
+        path += f"/<{uid}>"
+        # Route with unique ID
+        routes[name] = routes[name]+[
+          ['GET', path, 'read'],
+          ['PUT', path, 'update'],
+          ['DELETE', path, 'delete']
+        ]
+        for item in routes[name]:
+          key = f'{name}.{item[2]}'
+          url = f'/api/<string:version>/{item[1]}'
+
+          rule(url, key, methods=[item[0]])
+          if key not in views:
+            views[key] = view(name, item)
+
+
+
+	# Create Response
+  def createResponse(self, db, output, code):
+    auth = self.authenticate(lambda arg : db.read(db.config['schema']['parent'], arg))
+    if auth and 'id' in auth:
+      result = output(auth)
+      if 'error' in result:
+        return self.response(result['error'], result['code'])
+      else:
+        return self.response(result, code)
+    else:
+      return self.response(auth)
 
 
 
 	# Response
   def response(self, data = [], code = 401):
-    
     headers = []
     
     if data and len(data) > 0:
@@ -79,7 +143,6 @@ class HTTP:
       if isinstance(o, datetime.datetime):
           return o.__str__()
     return Response(json.dumps(para, default=default, sort_keys=True, indent=4, cls=DecimalEncoder), para['status'], headers, 'application/json')
-
 
 
 

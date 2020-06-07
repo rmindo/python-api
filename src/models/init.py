@@ -6,7 +6,7 @@ import mysql.connector
 # Initialize database
 ##
 def initialize(http, db):
-  # Create database of not exist
+  # Create database if not exist
   cur, con = db.createDB()
 
   # Token
