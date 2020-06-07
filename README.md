@@ -3,7 +3,13 @@
 Python-Flask RESTful API and MySQL
 
 
-### Run with separate container
+### Run docker with separate container
+
+##### Create Network
+Create docker network api 
+```
+$ docker network create -d bridge api
+```
 
 ##### MySQL Container
 Run mysql in a network api with MYSQL_ROOT_PASSWORD and MYSQL_ROOT_HOST specified.
@@ -116,15 +122,15 @@ NR0iQxriuZvmOSjAXswMlk4t4TMEge6QspAbZSa9o6rty2jMc0BJjKjFtPNVCkDuG5fAPxW20gCfn37Q
 ```
 ### Response Status Code
 ```
-	200: Ok
-	201: Created
-	400: Bad Request
-	401: Unauthorized
-	403: Forbidden
-	404: Not Found
-	405: Method Not Allowed
-	406: Not Acceptable
-	409: Conflict
+200: Ok
+201: Created
+400: Bad Request
+401: Unauthorized
+403: Forbidden
+404: Not Found
+405: Method Not Allowed
+406: Not Acceptable
+409: Conflict
 ```
 
 ### Database Schema
@@ -175,3 +181,9 @@ CREATE TABLE IF NOT EXISTS `addresses` (
   FOREIGN KEY (user) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ```
+
+
+### Diagram
+<p align="center">
+	<img width="600" src="https://i.ibb.co/R2cPg12/Schema-Design.png">
+</p>
