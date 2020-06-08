@@ -131,6 +131,7 @@ NR0iQxriuZvmOSjAXswMlk4t4TMEge6QspAbZSa9o6rty2jMc0BJjKjFtPNVCkDuG5fAPxW20gCfn37Q
 405: Method Not Allowed
 406: Not Acceptable
 409: Conflict
+500: Internal Server Error
 ```
 
 ### Database Schema
