@@ -8,7 +8,6 @@ from flask import Flask, jsonify, request, make_response, Response
 
 # Models
 from src.models.auth import Auth
-from src.models.init import initialize
 
 
 
@@ -26,7 +25,7 @@ class HTTP:
     '406': 'Not Acceptable',
     '409': 'Conflict',
     '500': 'Internal Server Error',
-	}
+  }
   
   # Request
   request = request
@@ -118,26 +117,26 @@ class HTTP:
     if data and len(data) > 0:
       if 'error' in data:
         para = {
-					'status': code,
-					'result': {
-						'error': data['error']
-					},
-					'message': self.status[str(code)],
-				}
+          'status': code,
+          'result': {
+            'error': data['error']
+          },
+          'message': self.status[str(code)],
+        }
       else:
         para = {
-					'status': code,
-					'result': data,
-					'message': self.status[str(code)],
-				}
+          'status': code,
+          'result': data,
+          'message': self.status[str(code)],
+        }
       
       if 'headers' in data:
         headers = data['headers']
     else:
       para = {
-				'status': code,
-				'message': self.status[str(code)],
-			}
+        'status': code,
+        'message': self.status[str(code)],
+      }
 
     def default(o):
       if isinstance(o, datetime.datetime):
