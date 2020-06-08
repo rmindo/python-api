@@ -35,7 +35,7 @@ class HTTP:
     
     # Authentication
     self.auth = Auth()
-		# Flask Framework
+    # Flask Framework
     self.flask = Flask(__name__)
     # Configuration
     self.config = config
@@ -93,10 +93,10 @@ class HTTP:
           rule(url, key, methods=[item[0]])
           if key not in views:
             views[key] = view(name, item)
-
-
-
-	# Create Response
+            
+            
+            
+  # Create Response
   def createResponse(self, db, output, code):
     auth = self.authenticate(lambda arg : db.read(db.config['schema']['parent'], arg))
     if auth and 'id' in auth:
@@ -107,10 +107,10 @@ class HTTP:
         return self.response(result, code)
     else:
       return self.response(auth)
-
-
-
-	# Response
+      
+      
+      
+  # Response
   def response(self, data = [], code = 401):
     headers = []
     
@@ -142,10 +142,10 @@ class HTTP:
       if isinstance(o, datetime.datetime):
           return o.__str__()
     return Response(json.dumps(para, default=default, sort_keys=True, indent=4, cls=DecimalEncoder), para['status'], headers, 'application/json')
-
-
-
-	# Authenticate
+    
+    
+    
+  # Authenticate
   def authenticate(self, user):
     
     auth = request.headers.get('authorization')
@@ -165,7 +165,7 @@ class HTTP:
               if verify == True:
                 return user
           else:
-            return {'code': 404, 'error': 'No records'}
+            return {'code': 404, 'error': 'No user found'}
                   
       return {'code': 401, 'error': 'Invalid Token'}
     else:
