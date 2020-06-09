@@ -39,6 +39,64 @@ class HTTP:
     self.flask = Flask(__name__)
     # Configuration
     self.config = config
+    
+    
+    
+  # Basic authentication
+  def basic(self, data, user):
+
+    auth = self.auth.decode(data).split(':')
+    user = user({'id': self.auth.hash(auth[0])})
+  
+    if len(user) > 0:
+      user = user[0]
+      if 'auth' in user and 'password' in user['auth']:
+        # Verify token
+        verify = self.auth.verify(auth[1], {'id': user['id']}, user['auth']['password'])
+        if verify == True:
+          return user
+
+      return {
+        'code': 401,
+        'error': 'Username/Password is Required',
+        'headers': {
+          'WWW-Authenticate': 'Basic realm="Required"'
+        }
+      }
+    else:
+      return {
+        'code': 404,
+        'error': 'No user found'
+      }
+  
+    
+    
+  # Bearer token authentication
+  def bearer(self, data, user):
+    parsed = self.auth.parse(data)
+
+    if parsed and 'payload' in parsed:
+      # Payload
+      payload = parsed['payload']
+      if 'token' in parsed:
+        user = user({'id': payload['id']})
+        if len(user) > 0:
+          user = user[0]
+          if 'auth' in user:
+            # Verify token
+            verify = self.auth.verify(user['auth']['key'], payload, parsed['signature'])
+            if verify == True:
+              return user
+        else:
+          return {
+            'code': 404,
+            'error': 'No user found'
+          }
+    else:          
+      return {
+        'code': 401,
+        'error': 'Invalid Token'
+      }
 
 
   
@@ -93,20 +151,6 @@ class HTTP:
           rule(url, key, methods=[item[0]])
           if key not in views:
             views[key] = view(name, item)
-            
-            
-            
-  # Create Response
-  def createResponse(self, db, output, code):
-    auth = self.authenticate(lambda arg : db.read(db.config['schema']['parent'], arg))
-    if auth and 'id' in auth:
-      result = output(auth)
-      if 'error' in result:
-        return self.response(result['error'], result['code'])
-      else:
-        return self.response(result, code)
-    else:
-      return self.response(auth)
       
       
       
@@ -142,34 +186,41 @@ class HTTP:
       if isinstance(o, datetime.datetime):
           return o.__str__()
     return Response(json.dumps(para, default=default, sort_keys=True, indent=4, cls=DecimalEncoder), para['status'], headers, 'application/json')
-    
-    
-    
+
+
+
   # Authenticate
   def authenticate(self, user):
-    
     auth = request.headers.get('authorization')
-    if auth and auth.find('Bearer') >= 0:
-      parsed = self.auth.parse(auth.replace('Bearer ', ''))
-
-      if parsed and 'payload' in parsed:
-        # Payload
-        payload = parsed['payload']
-        if 'token' in parsed:
-          user = user({'id': payload['id']})
-          if len(user) > 0:
-            user = user[0]
-            if 'auth' in user:
-              # Verify token
-              verify = self.auth.verify(user['auth']['key'], payload, parsed['signature'])
-              if verify == True:
-                return user
-          else:
-            return {'code': 404, 'error': 'No user found'}
-                  
-      return {'code': 401, 'error': 'Invalid Token'}
+    if auth:
+      # Clean authorization
+      def clean(name):
+        return auth.replace(f'{name} ', '')
+      # Check if has basic auth
+      if auth.find('Basic') >= 0:
+        return self.basic(clean('Basic'), user)
+      # Check if has bearer auth
+      elif auth.find('Bearer') >= 0:
+        return self.bearer(clean('Bearer'), user)
     else:
-      return {'code': 401, 'error': 'Missing Authorization'}
+      return {
+        'code': 401,
+        'error': 'Missing Authorization'
+      }
+            
+            
+            
+  # Create Response
+  def createResponse(self, db, output, code):
+    auth = self.authenticate(lambda arg : db.read(db.config['schema']['parent'], arg))
+    if auth and 'id' in auth:
+      result = output(auth)
+      if 'error' in result:
+        return self.response(result['error'], result['code'])
+      else:
+        return self.response(result, code)
+    else:
+      return self.response(auth)
 
 
 
