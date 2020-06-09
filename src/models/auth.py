@@ -59,14 +59,17 @@ class Auth:
   
   # Parse token
   def parse(self, token):
-    
     # Parsing
     encoded = token[86:]
     decoded = self.decode(encoded[:len(encoded)-86])
     
     if decoded:
       try:
-        return {'token': token, 'signature': encoded[len(encoded)-86:], 'payload': json.loads(decoded.replace("\'", "\""))}
+        return {
+          'token': token,
+          'signature': encoded[len(encoded)-86:],
+          'payload': json.loads(decoded.replace("\'", "\""))
+        }
       except Exception:
         return None
         
@@ -100,5 +103,8 @@ class Auth:
   
   # Create Token
   def createtoken(self, payload, key):
-    payload['exp'] = self.expiration(payload['exp'])
-    return self.random(86) + self.encode(str(payload)) + self.sign(key, str(payload))
+    if 'exp' in payload:
+      payload['exp'] = self.expiration(payload['exp'])
+      return self.random(86) + self.encode(str(payload)) + self.sign(key, str(payload))
+    else:
+      raise Exception('Missing required field "exp"')
