@@ -31,127 +31,84 @@ class HTTP:
   request = request
   
   
-  def __init__(self, config):
+  def __init__(self):
     
     # Authentication
     self.auth = Auth()
     # Flask Framework
     self.flask = Flask(__name__)
-    # Configuration
-    self.config = config
-    
-    
-    
-  # Basic authentication
-  def basic(self, data, user):
 
-    auth = self.auth.decode(data).split(':')
-    user = user({'id': self.auth.hash(auth[0])})
-  
-    if len(user) > 0:
-      user = user[0]
-      if 'auth' in user and 'password' in user['auth']:
-        # Verify token
-        verify = self.auth.verify(auth[1], {'id': user['id']}, user['auth']['password'])
-        if verify == True:
-          return user
 
-      return {
-        'code': 401,
-        'error': 'Username/Password is Required',
-        'headers': {
-          'WWW-Authenticate': 'Basic realm="Required"'
-        }
-      }
-    else:
-      return {
-        'code': 404,
-        'error': 'No user found'
-      }
-  
-    
-    
-  # Bearer token authentication
-  def bearer(self, data, user):
-    parsed = self.auth.parse(data)
 
-    if parsed and 'payload' in parsed:
-      # Payload
-      payload = parsed['payload']
-      if 'token' in parsed:
-        user = user({'id': payload['id']})
-        if len(user) > 0:
-          user = user[0]
-          if 'auth' in user:
-            # Verify token
-            verify = self.auth.verify(user['auth']['key'], payload, parsed['signature'])
-            if verify == True:
-              return user
+  # View functions
+  def view(self, name, func):
+
+    # Import module
+    def mod(version, name):
+      return imp.import_module(f"src.versions.{version}.{name}")
+      
+    def handler(**args):
+      try:
+        inst = getattr(mod(args['version'], name), name.capitalize())()
+        if hasattr(inst, func):
+          attr = getattr(inst, func)
+          if func == 'init':
+            return self.response(attr(self), 200)
+          else:
+            output, code = attr(request, args)
+            # Authenticate
+            auth = self.authenticate(inst)
+            if auth == True:
+              return self.response(output, code)
+            else:
+              return self.response(auth)
         else:
-          return {
-            'code': 404,
-            'error': 'No user found'
-          }
-    else:          
-      return {
-        'code': 401,
-        'error': 'Invalid Token'
-      }
-
+          return self.response({'error': f'Missing attribute {name}'}, 400)
+      except Exception:
+        return self.response({'error': 'Something went wrong'}, 500)
+    return handler
+    
 
   
   # API Services
-  def routes(self, db):
+  def routes(self, config):
     routes = {}
 
     # For routing
     rule = self.flask.add_url_rule
     views = self.flask.view_functions
 
-    # Import module
-    def mod(version, name):
-      return imp.import_module(f"src.versions.{version}.{name}")
-
-    # View functions
-    def view(name, item):
-      def handler(**args):
-        try:
-          ins = getattr(mod(args['version'], name), name.capitalize())(db)
-          if hasattr(ins, item[2]):
-            result, code = getattr(ins, item[2])(request, args)
-            if result:
-              return self.createResponse(db, result, code)
-          else:
-            return self.response({'error': f'Missing attribute {name}'}, 400)
-        except Exception:
-          return self.response({'error': 'Something went wrong'}, 500)
-      return handler
-
     # Resource routes
-    for items in self.config['resource']:
+    for items in config['resource']:
       path = ''
-      for name, uid in items.items():
+      for name, route in items.items():
         path += f"/{name}"
         # Route resource
         routes[name] = [
           ['GET', path, 'index'],
           ['POST', path, 'create'],
         ]
-        path += f"/<{uid}>"
-        # Route with unique ID
-        routes[name] = routes[name]+[
-          ['GET', path, 'read'],
-          ['PUT', path, 'update'],
-          ['DELETE', path, 'delete']
-        ]
+        # Variable rules
+        if 'var' in route:
+          path += f"/<{route['var']}>"
+          # Route with unique ID
+          routes[name] = routes[name]+[
+            ['GET', path, 'read'],
+            ['PUT', path, 'update'],
+            ['DELETE', path, 'delete']
+          ]
+        # Extra routes
+        if 'extra' in route:
+          routes[name] = routes[name]+route['extra']
+
+
         for item in routes[name]:
           key = f'{name}.{item[2]}'
           url = f'/api/<string:version>/{item[1]}'
 
           rule(url, key, methods=[item[0]])
           if key not in views:
-            views[key] = view(name, item)
-      
+            views[key] = self.view(name, item[2])
       
       
   # Response
@@ -196,31 +153,49 @@ class HTTP:
       # Clean authorization
       def clean(name):
         return auth.replace(f'{name} ', '')
+
       # Check if has basic auth
       if auth.find('Basic') >= 0:
-        return self.basic(clean('Basic'), user)
+
+        data = self.auth.decode(clean('Basic'))
+        data = list(filter(None, data.split(':')))
+
+        if len(data) == 2:
+          basic = user.basic(data[0])
+          if basic and 'payload' in basic and 'password' in basic:
+            return self.auth.verify(data[1], basic['payload'], basic['password'])
+          else:
+            return {
+              'code': 401,
+              'error': 'Invalid Username/Password'
+            }
+        else:
+          return {
+            'code': 401,
+            'error': 'Username/Password is Required',
+            'headers': {
+              'WWW-Authenticate': 'Basic realm="Required"'
+            }
+          }
       # Check if has bearer auth
-      elif auth.find('Bearer') >= 0:
-        return self.bearer(clean('Bearer'), user)
+      if auth.find('Bearer') >= 0:
+        parsed = self.auth.parse(clean('Bearer'))
+        if parsed and 'payload' in parsed:
+          # Secret key
+          bearer = user.bearer(parsed['payload'])
+          if bearer and 'token' in bearer and 'key' in bearer:
+            if bearer['token'] == parsed['token']:
+              # Verify token
+              return self.auth.verify(bearer['key'], parsed['payload'], parsed['signature'])
+        return {
+          'code': 401,
+          'error': 'Invalid Token'
+        }
     else:
       return {
         'code': 401,
         'error': 'Missing Authorization'
       }
-            
-            
-            
-  # Create Response
-  def createResponse(self, db, output, code):
-    auth = self.authenticate(lambda arg : db.read(db.config['schema']['parent'], arg))
-    if auth and 'id' in auth:
-      result = output(auth)
-      if 'error' in result:
-        return self.response(result['error'], result['code'])
-      else:
-        return self.response(result, code)
-    else:
-      return self.response(auth)
 
 
 

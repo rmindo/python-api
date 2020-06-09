@@ -4,34 +4,26 @@ import logging
 # CORS
 from flask_cors import CORS
 
-# Configuration
-from config import config
 # Request
 from src.http import HTTP
-# Models
-from src.models.init import initialize
-from src.models.database import Database
-
+# Configuration
+from src.config import config
 
 
 
 api = {}
 
 # HTTP Request
-http = HTTP(config)
-
-# Database
-database = Database(config)
+http = HTTP()
+##
+# Routes for every request
+#
+http.routes(config)
 
 ##
 # Allow Cross Origin
 #
 CORS(http.flask)
-
-##
-# Routes for every request
-#
-http.routes(database)
 
 
 
@@ -49,12 +41,6 @@ def notfound(e):
 def notallowed(e):
   return http.response([], 405)
 
-
-
-# Initialize database
-@http.flask.route('/init')
-def init():
-  return initialize(http, database)
 
 
 # Run the App

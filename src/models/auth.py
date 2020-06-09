@@ -90,7 +90,7 @@ class Auth:
   
   # Verify Token
   def verify(self, key, payload, signature):
-    
+
     sign = self.sign(key, str(payload))
     if 'exp' in payload and payload['exp'] < time.time():
       return None

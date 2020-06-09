@@ -73,4 +73,6 @@ def initialize(http, db):
 
   print('\nUse this token below for API Request:\n\n', f'{token}\n')
 
-  return http.response({'success': 'Successfully initialized database'}, 201)
+  return {
+    'success': 'Successfully initialized database'
+  }

@@ -15,9 +15,18 @@ config = {
   },
   'resource': [
     {
-      'users': 'string:id',
-      'contacts': 'string:key',
-      'addresses': 'string:index'
+      'users': {
+        'var': 'string:id',
+        'extra': [
+          ['GET', '/init', 'init']
+        ]
+      },
+      'contacts': {
+        'var': 'string:key'
+      },
+      'addresses': {
+        'var': 'string:index'
+      }
     },
   ]
 }

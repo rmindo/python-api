@@ -6,11 +6,6 @@ from src.versions.v1.api import API
 
 # API Version 1
 class Addresses(API):
-  
-  
-  def __init__(self, db):
-    # Database
-    self.db = db
 
   
   def index(self, req, para):
