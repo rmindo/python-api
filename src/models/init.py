@@ -2,6 +2,8 @@ import os
 import json
 import mysql.connector
 
+
+
 ##
 # Initialize database
 ##
@@ -9,31 +11,17 @@ def initialize(http, db):
   # Create database if not exist
   cur, con = db.createDB()
 
-  # Token
-  token = http.auth.createtoken({
-    'id': 1,
-    'exp': {
-      'days': 60
-    }
-  }, 'secret')
-
-  path = os.path.dirname(os.path.realpath(__file__))
 
   try:
-    for name in db.config['schema'].values():
-      f=open(f'{path}/schema/{name}.sql', 'r')
-      if f.mode == 'r':
-        try:
-          cur.execute(str(f.read()))
-          print(f"Successfully created table '{name}'")
-        except mysql.connector.Error as e:
-          if e.errno == mysql.connector.errorcode.ER_TABLE_EXISTS_ERROR:
-            print(f'Table {name} already is exists.')
-          else:
-            print(e.msg)
+    # Token
+    token = http.auth.createtoken({
+      'id': 1,
+      'exp': {
+        'days': 60
+      }
+    }, 'secret')
 
-    # Initial user
-    db.create('users', {
+    users = {
       "id": 1,
       "firstName": "Bob",
       "lastName": "Frederick",
@@ -44,18 +32,16 @@ def initialize(http, db):
         "key": "secret",
         "token": token
       })
-    })
+    }
 
-    # Initial contact
-    db.create('contacts', {
+    contacts = {
       "user": 1,
       "type": "email",
       "value": "bfe@sample.com",
       "preferred" : True
-    })
+    }
 
-    # Initial address
-    db.create('addresses', {
+    addresses = {
       "user": 1,
       "type": "home",
       "number": 1234,
@@ -64,15 +50,32 @@ def initialize(http, db):
       "city": "Somewhere",
       "state": "WV",
       "zipcode": "12345"
-    })
+    }
+
+    # Path of schema directory
+    path = os.path.dirname(os.path.realpath(__file__))
+
+    for name in db.config['schema'].values():
+      f=open(f'{path}/schema/{name}.sql', 'r')
+      if f.mode == 'r':
+        cur.execute(str(f.read()))
+
+    # Initial user
+    db.create('users', users)
+    # Initial contact
+    db.create('contacts', contacts)
+    # Initial address
+    db.create('addresses', addresses)
+
+    cur.close()
+    con.close()
+
+    return {
+      'token': token,
+      'success': 'Successfully initialized database'
+    }
+
   except mysql.connector.Error:
-    pass
-
-  cur.close()
-  con.close()
-
-  print('\nUse this token below for API Request:\n\n', f'{token}\n')
-
-  return {
-    'success': 'Successfully initialized database'
-  }
+    return {
+      'note': 'Database has been initiated already.'
+    }
