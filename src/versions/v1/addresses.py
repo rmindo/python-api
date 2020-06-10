@@ -8,21 +8,21 @@ from src.versions.v1.api import API
 class Addresses(API):
 
   
-  def index(self, req, para):
-    return self.getSubItems('addresses', req, para)
+  def index(self, http, var):
+    return self.getSubItems('addresses', http, var)
 
 
-  def read(self, req, para):
-    return self.getSubItem('addresses', req, para)
+  def read(self, http, var):
+    return self.getSubItem('addresses', http, var)
 
 
-  def create(self, req, para):
-    return self.addSubItem('addresses', req, para)
+  def create(self, http, var):
+    return self.addSubItem('addresses', http, var)
 
 
-  def update(self, req, para):
-    return self.updateSubItem('addresses', req, para)
+  def update(self, http, var):
+    return self.updateSubItem('addresses', http, var)
 
 
-  def delete(self, req, para):
-    return self.deleteSubItem('addresses', req, para)
+  def delete(self, http, var):
+    return self.deleteSubItem('addresses', http, var)

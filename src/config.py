@@ -18,10 +18,11 @@ config = {
       'users': {
         'var': 'string:id',
         'extra': [
-          ['GET', '/init', 'init']
+          ['GET', '/init', 'init', True]
         ]
       },
       'contacts': {
+        'pass': True,
         'var': 'string:key'
       },
       'addresses': {

@@ -8,7 +8,7 @@ from src.versions.v1.api import API
 class Users(API):
 
   
-  def index(self, req, para):
+  def index(self, http, var):
     tables = [
       'users',
       'contacts',
@@ -18,10 +18,10 @@ class Users(API):
 
 
 
-  def read(self, req, para):
-    if 'id' in para:
+  def read(self, http, var):
+    if 'id' in var:
       args = {
-        'id': para['id']
+        'id': var['id']
       }
       tables = [
         'users',
@@ -38,8 +38,8 @@ class Users(API):
       return {'error': 'Unable to get user.'}, 400
 
 
-  def create(self, req, para):
-    data = req.json
+  def create(self, http, var):
+    data = http.request.json
     if data:
       tables = [
         'users',
@@ -62,10 +62,10 @@ class Users(API):
     return {'error': 'Unable to create user.'}, 400
 
 
-  def update(self, req, para):
-    data = req.json
-    if data and 'id' in para:
-      updated = self.db.update('users', {'id': para['id']}, data)
+  def update(self, http, var):
+    data = http.request.json
+    if data and 'id' in var:
+      updated = self.db.update('users', {'id': var['id']}, data)
       if updated:
         return updated, 200
       else:
@@ -74,14 +74,14 @@ class Users(API):
       return {'error': 'No data received'}, 400
 
 
-  def delete(self, req, para):
+  def delete(self, http, var):
     args = {
-      'id': para['id']
+      'id': var['id']
     }
     if len(args['id']) > 1:
       if self.db.delete('users', args):
         success = {
-          'success': f"ID ({para['id']}) has been deleted successfully."
+          'success': f"ID ({var['id']}) has been deleted successfully."
         }
         return success, 200
       else:

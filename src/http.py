@@ -41,7 +41,7 @@ class HTTP:
 
 
   # View functions
-  def view(self, name, func):
+  def __view(self, name, route):
 
     # Import module
     def mod(version, name):
@@ -50,24 +50,26 @@ class HTTP:
     def handler(**args):
       try:
         inst = getattr(mod(args['version'], name), name.capitalize())()
-        if hasattr(inst, func):
-          attr = getattr(inst, func)
-          if func == 'init':
-            return self.response(attr(self), 200)
-          else:
-            output, code = attr(request, args)
-            # Authenticate
-            auth = self.authenticate(inst)
-            if auth == True:
-              return self.response(output, code)
+        if hasattr(inst, route[2]):
+          output, code = getattr(inst, route[2])(self, args)
+          try:
+            # Pass through without authentication
+            if route[3] == True:
+              pass
             else:
-              return self.response(auth)
+              # Authenticate
+              auth = self.authenticate(inst)
+              if auth != True:
+                return self.response(auth)
+            # Send output
+            return self.response(output, code)
+          except IndexError:
+            pass
         else:
           return self.response({'error': f'Missing attribute {name}'}, 400)
       except Exception:
         return self.response({'error': 'Something went wrong'}, 500)
     return handler
-    
 
   
   # API Services
@@ -81,34 +83,45 @@ class HTTP:
     # Resource routes
     for items in config['resource']:
       path = ''
-      for name, route in items.items():
+      for name, item in items.items():
         path += f"/{name}"
+        # Passthrough authentication
+        if 'pass' in item:
+          bypass = item['pass']
+        else:
+          bypass = False
         # Route resource
         routes[name] = [
-          ['GET', path, 'index'],
-          ['POST', path, 'create'],
+          ['GET', path, 'index', bypass],
+          ['POST', path, 'create', bypass],
         ]
         # Variable rules
-        if 'var' in route:
-          path += f"/<{route['var']}>"
+        if 'var' in item:
+          path += f"/<{item['var']}>"
           # Route with unique ID
           routes[name] = routes[name]+[
-            ['GET', path, 'read'],
-            ['PUT', path, 'update'],
-            ['DELETE', path, 'delete']
+            ['GET', path, 'read', bypass],
+            ['PUT', path, 'update', bypass],
+            ['DELETE', path, 'delete', bypass]
           ]
         # Extra routes
-        if 'extra' in route:
-          routes[name] = routes[name]+route['extra']
+        if 'extra' in item:
+          routes[name] = routes[name]+item['extra']
 
-
-        for item in routes[name]:
-          key = f'{name}.{item[2]}'
-          url = f'/api/<string:version>/{item[1]}'
-
-          rule(url, key, methods=[item[0]])
+        # Iterate routes and add rule
+        for route in routes[name]:
+          key = f'{name}.{route[2]}'
+          url = f'/api/<string:version>/{route[1]}'
+          # Add rule
+          rule(url, key, methods=[route[0]])
+          # Add to views
           if key not in views:
-            views[key] = self.view(name, item[2])
+            # If 'pass' field is not
+            # defined in config then add False
+            if len(route) == 3:
+              route.append(False)
+            # Add to the list of functions
+            views[key] = self.__view(name, route)
       
       
   # Response

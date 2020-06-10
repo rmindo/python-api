@@ -51,8 +51,8 @@ class API:
   ##
   # Initialize database
   #
-  def init(self, http):
-    return initialize(http, self.db)
+  def init(self, http, var):
+    return initialize(http, self.db), 200
 
 
 
@@ -121,10 +121,10 @@ class API:
   ##
   # Add sub item
   #
-  def addSubItem(self, name, req, para = {}):
-    data = req.json
-    if data and 'id' in para:
-      data['user'] = para['id']
+  def addSubItem(self, name, http, var):
+    data = http.request.json
+    if data and 'id' in var:
+      data['user'] = var['id']
       return self.db.create(name, data), 201
     else:
       return {'error': 'Unable to create item.'}, 400
@@ -133,14 +133,14 @@ class API:
   ##
   # Get sub item
   #
-  def getSubItem(self, name, req, para = {}):
-    if 'id' in para and 'key' in para:
+  def getSubItem(self, name, http, var):
+    if 'id' in var and 'key' in var:
       args = {
-        'id': para['key'],
-        'user': para['id']
+        'id': var['key'],
+        'user': var['id']
       }
-      if 'index' in para:
-        args['id'] = para['index']
+      if 'index' in var:
+        args['id'] = var['index']
         
       items = self.db.read(name, args, getattr(self, name))
       if len(items) == 1:
@@ -154,10 +154,10 @@ class API:
   ##
   # Get sub items
   #
-  def getSubItems(self, name, req, para = {}):
-    if 'id' in para:
+  def getSubItems(self, name, http, var):
+    if 'id' in var:
       args = {
-        'user': para['id']
+        'user': var['id']
       }
       items = self.db.read(name, args, getattr(self, name))
       if len(items) > 0:
@@ -171,15 +171,15 @@ class API:
   ##
   # Update sub item
   #
-  def updateSubItem(self, name, req, para = {}):
-    data = req.json
-    if 'id' in para and 'key' in para:
+  def updateSubItem(self, name, http, var):
+    data = http.request.json
+    if 'id' in var and 'key' in var:
       args = {
-        'id': para['key'],
-        'user': para['id']
+        'id': var['key'],
+        'user': var['id']
       }
-      if 'index' in para:
-        args['id'] = para['index']
+      if 'index' in var:
+        args['id'] = var['index']
 
       item = self.db.update(name, args, data)
       if item:
@@ -193,18 +193,18 @@ class API:
   ##
   # Delete sub item
   #
-  def deleteSubItem(self, name, req, para = {}):
-    if 'id' in para and 'key' in para:
+  def deleteSubItem(self, name, http, var):
+    if 'id' in var and 'key' in var:
       args = {
-        'id': para['key'],
-        'user': para['id']
+        'id': var['key'],
+        'user': var['id']
       }
-      if 'index' in para:
-        args['id'] = para['index']
+      if 'index' in var:
+        args['id'] = var['index']
 
       if self.db.delete(name, args):
         success = {
-          'success': f"ID ({para['id']}) has been deleted successfully."
+          'success': f"ID ({var['id']}) has been deleted successfully."
         }
         return success, 200
       else:
