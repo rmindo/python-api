@@ -156,7 +156,7 @@ config = {
 ##### Resource Fields
 | Field Name         | Description                                                       | Required          |
 |--------------------|-------------------------------------------------------------------|-------------------|
-| var                | Variable rule of the url /resource/<string:id>                    | true              |
+| var                | Variable rule of the url /resource/\<string:id\>                  | true              |
 | pass               | Pass through without authentication including single item.        | false             |
 | extra              | Extra routes from a resource                                      | false             |
 
