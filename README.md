@@ -79,10 +79,19 @@ networks:
 ```
 $ docker-composer up
 ```
+
+### Authorization
+HTTP header request should have authorization field with token generated from GET /api/v1/init
+```
+{
+    "Authorization": "Bearer {API_TOKEN_HERE}"
+}
+```
+
 ### API Endpoints
 
 ##### Init
-Initialize database and request token
+Initialize database and generate token
 - GET /api/v1/init
 
 ##### Users
@@ -107,19 +116,7 @@ Initialize database and request token
 - DELETE /api/v1/users/{user_id}/contacts/{contact_id}/addresses/{address_id}
 
 
-### Authorization
-HTTP header request should have authorization field with token
-```
-{
-    "Authorization": "Bearer {API_TOKEN_HERE}"
-}
-```
 
-##### Sample API Token
-Use this token to test the API or generate token by requesting GET /api/1v/init and see the token in the console log.
-```
-NR0iQxriuZvmOSjAXswMlk4t4TMEge6QspAbZSa9o6rty2jMc0BJjKjFtPNVCkDuG5fAPxW20gCfn37QT7dP3CeydpZCc6IDEsICdleHAnOiAxNTk1ODMyNjE0LjB9ODc0OGQ5MjBhMDJkYzZiMjg4ZjRiMDc4ZDA3ZWQ0MjFmOWVhMDRiMmVhMDIwYzFiODVmYTU0MjE0ZjA5Yzg4Mg
-```
 ### Response Status Code
 ```
 200: Ok
@@ -133,6 +130,43 @@ NR0iQxriuZvmOSjAXswMlk4t4TMEge6QspAbZSa9o6rty2jMc0BJjKjFtPNVCkDuG5fAPxW20gCfn37Q
 409: Conflict
 500: Internal Server Error
 ```
+
+### Add New Routes
+##### Configuration
+Configuration file is located at /src/config.py
+```
+config = {
+  'resource': [
+    {
+      'users': {
+        'var': 'string:id',
+        'extra': [
+          ['GET', '/init', 'init', True]
+        ]
+      },
+      'contacts': {
+        'pass': True,
+        'var': 'string:key'
+      },
+    },
+  ]
+}
+```
+
+##### Resource Fields
+| Field Name         | Description                                                       | Required          |
+|--------------------|-------------------------------------------------------------------|-------------------|
+| var                | Variable rule of the url /resource/<string:id>                    | true              |
+| pass               | Pass through without authentication including single item.        | false             |
+| extra              | Extra routes from a resource                                      | false             |
+
+##### Extra Field
+Method, Path, Function, Pass Through
+```
+['GET', '/init', 'init', True]
+```
+
+
 
 ### Database Schema
 ##### Parent table users
