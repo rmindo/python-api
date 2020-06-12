@@ -12,35 +12,33 @@ from src.models.database import Database
 class API:
 
 
-  # Columns of contacts
-  contacts = [
-    'id',
-    'type',
-    'value',
-    'preferred'
-  ]
+  columns = {
+    'users': [
+      'title',
+      'gender',
+      'address',
+      'lastname',
+      'firstname',
+      'dateofbirth'
+    ],
+    'contacts': [
+      'id',
+      'type',
+      'value',
+      'preferred'
+    ],
+    'addresses': [
+      'id',
+      'unit',
+      'type',
+      'city',
+      'state',
+      'number',
+      'street',
+      'zipcode'
+    ]
+  }
 
-  # Columns of addresses
-  addresses = [
-    'id',
-    'unit',
-    'type',
-    'city',
-    'state',
-    'number',
-    'street',
-    'zipcode'
-  ]
-
-  # Columns of users
-  identification = [
-    'title',
-    'gender',
-    'address',
-    'lastname',
-    'firstname',
-    'dateofbirth'
-  ]
 
   def __init__(self):
     # Database
@@ -55,6 +53,16 @@ class API:
     return initialize(http, self.db), 200
 
 
+  
+  ##
+  # Check if key not
+  def not_in(self, data1, resource):
+    for name in data1:
+      if name not in self.columns[resource]:
+        return name
+
+
+
 
   def sort(self, rows):
     data = []
@@ -62,24 +70,25 @@ class API:
     addresses = []
 
     for row in rows:
+      users = {}
       address = {}
       contact = {}
-      identification = {}
 
       for name in row:
-        if name in self.contacts:
+        if name in self.columns['users']:
+          users[name] = row[name]
+        if name in self.columns['contacts']:
           contact[name] = row[name]
-        if name in self.addresses:
+        if name in self.columns['addresses']:
           address[name] = row[name]
-        if name in self.identification:
-          identification[name] = row[name]
 
       contacts.append(contact)
       addresses.append(address)
+
       data.append({
         'contacts': contacts,
         'addresses': addresses,
-        'identification': identification,
+        'identification': users,
       })
 
     return data
@@ -123,11 +132,16 @@ class API:
   #
   def addSubItem(self, name, http, var):
     data = http.request.json
-    if data and 'id' in var:
-      data['user'] = var['id']
-      return self.db.create(name, data), 201
+    prop = self.not_in(data, 'users')
+
+    if prop:
+      return {'error': f"Undefined property name '{prop}'."}, 400
     else:
-      return {'error': 'Unable to create item.'}, 400
+      if data and 'id' in var:
+        data['user'] = var['id']
+        return self.db.create(name, data), 201
+      else:
+        return {'error': 'Unable to create item.'}, 400
   
 
   ##
@@ -173,21 +187,26 @@ class API:
   #
   def updateSubItem(self, name, http, var):
     data = http.request.json
-    if 'id' in var and 'key' in var:
-      args = {
-        'id': var['key'],
-        'user': var['id']
-      }
-      if 'index' in var:
-        args['id'] = var['index']
+    prop = self.not_in(data, 'users')
 
-      item = self.db.update(name, args, data)
-      if item:
-        return item, 200
-      else:
-        return {'error': 'Unable to update item.'}, 400 
+    if prop:
+      return {'error': f"Undefined property name '{prop}'."}, 400
     else:
-      return {'error': 'No data received'}, 400
+      if 'id' in var and 'key' in var:
+        args = {
+          'id': var['key'],
+          'user': var['id']
+        }
+        if 'index' in var:
+          args['id'] = var['index']
+
+        item = self.db.update(name, args, data)
+        if item:
+          return item, 200
+        else:
+          return {'error': 'Unable to update item.'}, 400 
+      else:
+        return {'error': 'No data received'}, 400
       
 
   ##

@@ -72,6 +72,19 @@ class Auth:
         }
       except Exception:
         return None
+    
+  
+  # Verify Token
+  def verify(self, key, payload, signature):
+
+    sign = self.sign(key, str(payload))
+    if 'exp' in payload and payload['exp'] < time.time():
+      return None
+    else:
+      if sign and hmac.compare_digest(signature, sign):
+        return True
+      else:
+        return False
         
   
   # Token Expiration
@@ -86,19 +99,6 @@ class Auth:
       exp['minutes'] = 0
     
     return time.mktime((today + datetime.timedelta(minutes=exp['minutes'], hours=exp['hours'], days=exp['days'])).timetuple())
-    
-  
-  # Verify Token
-  def verify(self, key, payload, signature):
-
-    sign = self.sign(key, str(payload))
-    if 'exp' in payload and payload['exp'] < time.time():
-      return None
-    else:
-      if sign and hmac.compare_digest(signature, sign):
-        return True
-      else:
-        return False
   
   
   # Create Token

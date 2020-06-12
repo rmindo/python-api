@@ -40,38 +40,48 @@ class Users(API):
 
   def create(self, http, var):
     data = http.request.json
-    if data:
-      tables = [
-        'users',
-        'contacts',
-        'addresses'
-      ]
-      if 'identification' in data:
-        user = self.db.create('users', data['identification'])
-        if 'id' in user:
-          if 'contacts' in data:
-            data['contacts']['user'] = user['id']
-            self.db.create('contacts', data['contacts'])
-          if 'addresses' in data:
-            data['addresses']['user'] = user['id']
-            self.db.create('addresses', data['addresses'])
+    prop = self.not_in(data, 'users')
 
-          user = self.db.join(tables, ['id','user'], {'id': user['id']})
-          if len(user) == 1:
-            return self.sort(user)[0], 201
-    return {'error': 'Unable to create user.'}, 400
+    if prop:
+      return {'error': f"Undefined property name '{prop}'."}, 400
+    else:
+      if data:
+        tables = [
+          'users',
+          'contacts',
+          'addresses'
+        ]
+        if 'identification' in data:
+          user = self.db.create('users', data['identification'])
+          if 'id' in user:
+            if 'contacts' in data:
+              data['contacts']['user'] = user['id']
+              self.db.create('contacts', data['contacts'])
+            if 'addresses' in data:
+              data['addresses']['user'] = user['id']
+              self.db.create('addresses', data['addresses'])
+
+            user = self.db.join(tables, ['id','user'], {'id': user['id']})
+            if len(user) == 1:
+              return self.sort(user)[0], 201
+      return {'error': 'Unable to create user.'}, 400
 
 
   def update(self, http, var):
     data = http.request.json
-    if data and 'id' in var:
-      updated = self.db.update('users', {'id': var['id']}, data)
-      if updated:
-        return updated, 200
-      else:
-        return {'error': 'Unable to update user.'}, 400 
+    prop = self.not_in(data, 'users')
+
+    if prop:
+      return {'error': f"Undefined property name '{prop}'."}, 400
     else:
-      return {'error': 'No data received'}, 400
+      if data and 'id' in var:
+        updated = self.db.update('users', {'id': var['id']}, data)
+        if updated:
+          return updated, 200
+        else:
+          return {'error': 'Unable to update user.'}, 400 
+      else:
+        return {'error': 'No data received'}, 400
 
 
   def delete(self, http, var):

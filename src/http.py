@@ -168,7 +168,7 @@ class HTTP:
         return auth.replace(f'{name} ', '')
 
       # Check if has basic auth
-      if auth.find('Basic') >= 0:
+      if hasattr(user, 'basic') and auth.find('Basic') >= 0:
 
         data = self.auth.decode(clean('Basic'))
         data = list(filter(None, data.split(':')))
@@ -191,10 +191,9 @@ class HTTP:
             }
           }
       # Check if has bearer auth
-      if auth.find('Bearer') >= 0:
+      if hasattr(user, 'bearer') and auth.find('Bearer') >= 0:
         parsed = self.auth.parse(clean('Bearer'))
         if parsed and 'payload' in parsed:
-          # Secret key
           bearer = user.bearer(parsed['payload'])
           if bearer and 'token' in bearer and 'key' in bearer:
             if bearer['token'] == parsed['token']:
