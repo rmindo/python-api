@@ -132,7 +132,7 @@ class API:
   #
   def addSubItem(self, name, http, var):
     data = http.request.json
-    prop = self.not_in(data, 'users')
+    prop = self.not_in(data, name)
 
     if prop:
       return {'error': f"Undefined property name '{prop}'."}, 400
@@ -187,7 +187,7 @@ class API:
   #
   def updateSubItem(self, name, http, var):
     data = http.request.json
-    prop = self.not_in(data, 'users')
+    prop = self.not_in(data, name)
 
     if prop:
       return {'error': f"Undefined property name '{prop}'."}, 400
