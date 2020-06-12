@@ -155,8 +155,8 @@ class API:
       }
       if 'index' in var:
         args['id'] = var['index']
-        
-      items = self.db.read(name, args, getattr(self, name))
+      
+      items = self.db.read(name, args, self.columns[name])
       if len(items) == 1:
         return items[0], 200
       else:
@@ -173,7 +173,7 @@ class API:
       args = {
         'user': var['id']
       }
-      items = self.db.read(name, args, getattr(self, name))
+      items = self.db.read(name, args, self.columns[name])
       if len(items) > 0:
         return items, 200
       else:
