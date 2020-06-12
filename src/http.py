@@ -52,19 +52,16 @@ class HTTP:
         inst = getattr(mod(args['version'], name), name.capitalize())()
         if hasattr(inst, route[2]):
           output, code = getattr(inst, route[2])(self, args)
-          try:
-            # Pass through without authentication
-            if route[3] == True:
-              pass
-            else:
-              # Authenticate
-              auth = self.authenticate(inst)
-              if auth != True:
-                return self.response(auth)
-            # Send output
-            return self.response(output, code)
-          except IndexError:
+          # Pass through without authentication
+          if route[3] == True:
             pass
+          else:
+            # Authenticate
+            auth = self.authenticate(inst)
+            if auth != True:
+              return self.response(auth)
+          # Send output
+          return self.response(output, code)
         else:
           return self.response({'error': f'Missing attribute {name}'}, 400)
       except Exception:
