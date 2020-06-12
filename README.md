@@ -1,6 +1,6 @@
 # Python RESTful API
 
-Python-Flask RESTful API and MySQL
+Python-Flask RESTful API with MySQL
 
 
 ### Run docker with separate container
