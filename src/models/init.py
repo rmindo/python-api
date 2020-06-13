@@ -23,11 +23,11 @@ def initialize(http, db):
 
     users = {
       "id": 1,
-      "firstName": "Bob",
-      "lastName": "Frederick",
-      "dateofbirth": "06/21/1980",
+      "firstName": "Ruel",
+      "lastName": "Mindo",
+      "dateofbirth": "12/12/1212",
       "gender": "M",
-      "title": "Manager",
+      "title": "Full Stack Engineer",
       "auth": json.dumps({
         "key": "secret",
         "token": token
@@ -37,19 +37,19 @@ def initialize(http, db):
     contacts = {
       "user": 1,
       "type": "email",
-      "value": "bfe@sample.com",
+      "value": "ruel@coderstage.com",
       "preferred" : True
     }
 
     addresses = {
       "user": 1,
       "type": "home",
-      "number": 1234,
-      "street": "blah blah St",
-      "unit": "1 a",
-      "city": "Somewhere",
-      "state": "WV",
-      "zipcode": "12345"
+      "number": 987654321,
+      "street": "Colon Street",
+      "unit": "Unit 1",
+      "city": "Cebu City",
+      "state": "Central Visayas",
+      "zipcode": "6000"
     }
 
     # Path of schema directory
