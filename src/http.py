@@ -113,8 +113,8 @@ class HTTP:
           rule(url, key, methods=[route[0]])
           # Add to views
           if key not in views:
-            # If 'pass' field is not
-            # defined in config then add False
+            # If 'pass' is not
+            # defined from config then add False
             if len(route) == 3:
               route.append(False)
             # Add to the list of functions
