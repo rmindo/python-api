@@ -11,7 +11,7 @@ services:
       - api
     environment:
       MYSQL_USER: root
-      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_HOST: 127.0.0.1
       MYSQL_PASSWORD: demo
       MYSQL_DATABASE: demo
       MYSQL_ROOT_PASSWORD: demo
