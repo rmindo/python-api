@@ -55,7 +55,8 @@ class API:
 
   
   ##
-  # Check if key not
+  # Check if key not in data
+  #
   def not_in(self, data1, resource):
     for name in data1:
       if name not in self.columns[resource]:
@@ -63,7 +64,9 @@ class API:
 
 
 
-
+  ##
+  # Sort data
+  #
   def sort(self, rows):
     data = []
     contacts = []
