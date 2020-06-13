@@ -64,8 +64,8 @@ class HTTP:
           return self.response(output, code)
         else:
           return self.response({'error': f'Missing attribute {name}'}, 400)
-      except Exception:
-        return self.response({'error': 'Something went wrong'}, 500)
+      except Exception as e:
+        return self.response({'error': str(e)}, 500)
     return handler
 
   
