@@ -8,7 +8,7 @@ Python-Flask RESTful API with MySQL
 ##### Create Network
 Create docker network api 
 ```
-$ docker network create -d bridge api
+$ docker network create -d api
 ```
 
 ##### MySQL Container
