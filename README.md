@@ -77,7 +77,7 @@ networks:
 
 ##### Run docker-compose containers
 ```
-$ docker-composer up
+$ docker-compose up
 ```
 
 ### Authorization
