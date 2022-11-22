@@ -8,16 +8,16 @@ Python-Flask RESTful API with MySQL
 ##### Create Network
 Create docker network api 
 ```
-$ docker network create -d bridge api
+docker network create -d bridge api
 ```
 
 ##### MySQL Container
 Run mysql in a network api with MYSQL_ROOT_PASSWORD and MYSQL_ROOT_HOST specified.
 ```
-$ docker pull mysql
+docker pull mysql
 ```
 ```
-$ docker run --network=api --name=mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=demo -e MYSQL_ROOT_HOST=% mysql
+docker run --network=api --name=mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=demo -e MYSQL_ROOT_HOST=% mysql
 ```
 
 
@@ -25,10 +25,10 @@ $ docker run --network=api --name=mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=demo
 Run a separate container with public port 2000 in a network api
 
 ```
-$ docker pull rmindo/python-api
+docker pull rmindo/python-api
 ```
 ```
-$ docker run --rm -it -p 2000:80 --network=api --name=api -v /$(pwd):/www/api rmindo/python-api
+docker run --rm -it -p 2000:80 --network=api --name=api -v /$(pwd):/www/api rmindo/python-api
 ```
 
 ### Run with docker-compose
@@ -77,7 +77,7 @@ networks:
 
 ##### Run docker-compose containers
 ```
-$ docker-compose up
+docker-compose up
 ```
 
 ### Authorization
