@@ -12,7 +12,7 @@ docker network create -d bridge api
 ```
 
 ##### MySQL Container
-Run mysql in a network api with MYSQL_ROOT_PASSWORD and MYSQL_ROOT_HOST specified.
+Run mysql in a network api with root password and root host specified.
 ```
 docker pull mysql
 ```
